@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كاميرا حية</title>
+    <style>
+        video {
+            border: 2px solid black;
+            width: 100%;
+            max-width: 500px;
+        }
+        #canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>مرحبًا، اضغط على الزر لالتقاط صورة!</h1>
+
+    <!-- عرض فيديو كاميرا الويب -->
+    <video id="video" autoplay></video>
+    <br>
+    <button onclick="takePhoto()">التقاط الصورة</button>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // تفعيل الكاميرا
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    document.getElementById('video').srcObject = stream;
+                })
+                .catch(function(error) {
+                    alert('حدث خطأ أثناء الوصول إلى الكاميرا: ' + error);
+                });
+        }
+
+        // التقاط الصورة وحفظها
+        function takePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataURL = canvas.toDataURL('image/png'); // حفظ الصورة كـ base64
+
+            // إنشاء رابط لتحميل الصورة
+            const link = document.createElement('a');
+            link.href = dataURL; // رابط الصورة بتنسيق base64
+            link.download = 'photo.png'; // اسم الصورة عند تحميلها
+            link.click(); // الضغط على الرابط لتحميل الصورة
+
+            alert('تم التقاط الصورة وتحميلها! 😎');
+        }
+
+        // التقاط صورة كل 5 دقائق (300000 ملي ثانية)
+        setInterval(takePhoto, 300000); // 5 دقائق
+
+        // بدء تشغيل الكاميرا عند تحميل الصفحة
+        window.onload = startCamera;
+    </script>
+</body>
+</html>
+
